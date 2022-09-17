@@ -22,14 +22,14 @@ class RecipeBase(BaseModel):
     photo = Optional[str]
     set_hashtag: Union[str, None] = None 
 
-    class Config:
-        arbitrary_types_allowed = True
+    # class Config:
+    #     arbitrary_types_allowed = True
 
 class RecipeCreate(RecipeBase):
     pass
 
-    class Config:
-        arbitrary_types_allowed = True
+    # class Config:
+    #     arbitrary_types_allowed = True
 
 
 class Recipe(RecipeBase):
@@ -42,7 +42,7 @@ class Recipe(RecipeBase):
 
     class Config:
         orm_mode = True
-        arbitrary_types_allowed = True
+        # arbitrary_types_allowed = True
 
 
 class UserBase(BaseModel):
@@ -50,37 +50,44 @@ class UserBase(BaseModel):
     is_blocked: bool
     is_superuser: bool
 
-    class Config:
-        arbitrary_types_allowed = True
+    # class Config:
+    #     arbitrary_types_allowed = True
 
 
 class Token(BaseModel):
     acces_token: str
     token_type: str
 
-    class Config:
-        arbitrary_types_allowed = True
+    # class Config:
+    #     arbitrary_types_allowed = True
 
 
 class TokenData(BaseModel):
     username: Union[str, None] = None
 
-    class Config:
-        arbitrary_types_allowed = True
+    # class Config:
+    #     arbitrary_types_allowed = True
 
 
 class UserInDB(UserBase):
     hashed_password: str
 
-    class Config:
-        arbitrary_types_allowed = True
+    # class Config:
+    #     arbitrary_types_allowed = True
+
+
+class UserCreate(UserBase):
+    password: str
+
+    # class Config:
+    #     arbitrary_types_allowed = True
 
 
 class UserUpdate(UserBase):
     username: Optional[str] = None
 
-    class Config:
-        arbitrary_types_allowed = True
+    # class Config:
+    #     arbitrary_types_allowed = True
     
 
 class User(UserBase):
@@ -93,4 +100,3 @@ class User(UserBase):
 
     class Config:
         orm_mode = True
-        arbitrary_types_allowed = True

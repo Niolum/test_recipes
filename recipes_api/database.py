@@ -7,9 +7,9 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
+# SQLALCHEMY_DATABASE_URL = f"postgresql://{settings.DB_USER}:{settings.DB_PASS}@{settings.DB_HOSTNAME}:{settings.DB_PORT}/{settings.DB_NAME}"
 
-DATABASE_URL = os.getenv("DATABASE_URL")
-ngine = create_engine(DATABASE_URL)
+
 
 SQLALCHEMY_DATABASE_URL = "postgresql://niolum:170498sb@postgresserver/recipesdb"
 
