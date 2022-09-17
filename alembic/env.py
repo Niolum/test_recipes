@@ -1,36 +1,22 @@
 from logging.config import fileConfig
-from os import environ
-import os, sys
+
 from sqlalchemy import engine_from_config
 from sqlalchemy import pool
-from recipes_api.models import User, Recipe, user_recipe
-
 
 from alembic import context
+
+import os, sys
 from dotenv import load_dotenv
-# BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-# load_dotenv(os.path.join(BASE_DIR, ".env"))
-# sys.path.append(BASE_DIR)
+
+BASE_DIR= os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+load_dotenv(os.path.join(BASE_DIR, '.env'))
+sys.path.append(BASE_DIR)
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
-load_dotenv()
-# DB_USER = os.getenv("DB_USER")
-# DB_PASS = os.getenv("DB_PASS")
-# DB_HOST = os.getenv("DB_HOST")
-# DB_NAME = os.getenv("DB_NAME")
-
-# connection_string = f'postgresql+psycopg2://{DB_USER}:{DB_PASS}@{DB_HOST}/{DB_NAME}'
 config = context.config
-config.set_main_option('sqlalchemy.url', os.environ["DATABASE_URL"])
 
-
-
-# section = config.config_ini_section
-# config.set_section_option(section, "DB_USER", environ.get("DB_USER"))
-# config.set_section_option(section, "DB_PASS", environ.get("DB_PASS"))
-# config.set_section_option(section, "DB_NAME", environ.get("DB_NAME"))
-# config.set_section_option(section, "DB_HOST", environ.get("DB_HOST"))
+config.set_main_option('sqlalchemy.url', os.environ['DATABASE_URL'])
 
 # Interpret the config file for Python logging.
 # This line sets up loggers basically.
@@ -41,9 +27,10 @@ if config.config_file_name is not None:
 # for 'autogenerate' support
 # from myapp import mymodel
 # target_metadata = mymodel.Base.metadata
-from recipes_api import models
+import recipes_api.models
 
-target_metadata = models.Base.metadata
+
+target_metadata = recipes_api.models.Base.metadata
 
 # other values from the config, defined by the needs of env.py,
 # can be acquired:

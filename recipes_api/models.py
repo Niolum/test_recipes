@@ -20,7 +20,7 @@ class TypeRecipeEnum(enum.Enum):
 class User(Base):
     __tablename__ = "users"
 
-    id = Column(Integer, primary_key=True, index=True, unique=True, autoincrement=True)
+    id = Column(Integer, primary_key=True, index=True, unique=True)
     username = Column(String(30), nullable= False, index=True, comment='Имя пользователя')
     hashed_password = Column(String, comment='Пароль')
     is_blocked = Column(Boolean, default=False, index=True, comment='Статус: заблокирован или активен')
@@ -34,8 +34,9 @@ class User(Base):
 class Recipe(Base):
     __tablename__ = "recipes"
 
-    id = Column(Integer, primary_key=True, index=True, unique=True, autoincrement=True)
+    id = Column(Integer, primary_key=True, index=True, unique=True)
     author = relationship('User', back_populates='recipes')
+    author_id = Column(Integer, ForeignKey("users.id"))
     created_on = Column(DateTime(), default=datetime.now, comment='Дата создания')
     updated_on = Column(DateTime(), default=datetime.now, onupdate=datetime.now, comment='Дата измерерия')
     name = Column(String(120), comment='Название блюда')

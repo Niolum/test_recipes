@@ -4,38 +4,25 @@ from fastapi import FastAPI, Depends, HTTPException, status
 from jose import JWTError, jwt
 from passlib.context import CryptContext
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
-from .schemas import UserInDB, TokenData, UserBase, Token
+# from .schemas import UserInDB, TokenData, UserBase, Token
 import os
-from .database import get_db
-import databases
+from sqlalchemy.orm import Session
+from .schemas import *
+from recipes_api import crud
+from .database import SessionLocal, engine
+# from db.base import database
+# from .database import get_db
+# import databases
+from dotenv import load_dotenv
 
-# DATABASE_URL = os.getenv("DATABASE_URL")
-# DB_PASS = os.getenv("DB_PASS")
-# DB_HOST = os.getenv("DB_HOST")
-# DB_NAME = os.getenv("DB_NAME")
-# SQLALCHEMY_DATABASE_URL = (
-#     f"postgresql://{DB_USER}:{DB_PASS}@{DB_HOST}:5432/{DB_NAME}"
-# )
-# создаем объект database, который будет использоваться для выполнения запросов
-# database = databases.Database(DATABASE_URL)
+load_dotenv()
 
 
 
+SECRET_KEY = os.getenv("SECRET_KEY")
+ALGORITHM = os.getenv("ALGORITHM")
+ACCESS_TOKEN_EXPIRE_MINUTES = os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES")
 
-
-# SECRET_KEY = "30ba1c2eda4977a183c8e6db228185a34e359aa6d86dfd69c9bc77150be2b735"
-SECRET_KEY = "09d25e094faa6ca2556c818166b7a9563b93f7099f6f0f4caa6cf63b88e8d3e7"
-ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = 30
-
-
-fake_users_db = {
-    "niolum": {
-        "username": "niolum",
-        "hashed_password": "$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW",
-        "disabled": False,
-    }
-}
 
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
@@ -44,6 +31,13 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
 
 app = FastAPI()
+
+def get_db():
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
 
 
 def verify_password(plain_password, hashed_password):
@@ -122,11 +116,57 @@ async def login_for_acces_token(form_data: OAuth2PasswordRequestForm = Depends()
     return {"access_token": access_token, "token_type": "bearer"}
 
 
-@app.get("/users/me", response_model=UserBase)
-async def read_users_me(current_user: UserBase = Depends(get_current_active_user)):
-    return current_user
+# @app.get("/users/me", response_model=UserBase)
+# async def read_users_me(current_user: UserBase = Depends(get_current_active_user)):
+#     return current_user
 
 
-@app.get("/users/me/recipes/")
-async def read_own_recipes(current_user: UserBase = Depends(get_current_active_user)):
-    return [{"recipe_id": "Foo", "author_id": current_user.username}]
+# @app.get("/users/me/recipes/")
+# async def read_own_recipes(current_user: UserBase = Depends(get_current_active_user)):
+#     return [{"recipe_id": "Foo", "author_id": current_user.username}]
+
+
+
+# @app.get("/users/me/", response_model=UserBase)
+# async def read_users_me(current_user: UserBase = Depends(get_current_active_user)):
+#     return current_user
+
+
+# @app.get("/users/me/items/")
+# async def read_own_items(current_user: UserBase = Depends(get_current_active_user)):
+#     return [{"item_id": "Foo", "owner": current_user.username}]
+
+
+
+
+@app.post("/users/", response_model=User)
+def create_user(user: UserCreate, db: Session = Depends(get_db)):
+    db_user = crud.get_user_by_name(db, username=user.username)
+    if db_user:
+        raise HTTPException(status_code=400, detail="Username already registered")
+    return crud.create_user(db=db, user=user)
+
+
+@app.get("/users/", response_model=List[User])
+def read_users(skip: int = 0, limit: int = 10, db: Session = Depends(get_db)):
+    users = crud.get_users(db, skip=skip, limit=limit)
+    return users
+
+
+@app.get("/users/{user_id}", response_model=User)
+def read_user(user_id: int, db: Session = Depends(get_db)):
+    db_user = crud.get_user(db, user_id=user_id)
+    if db_user is None:
+        raise HTTPException(status_code=400, detail="User not found")
+    return db_user
+
+
+@app.post("/users/{user_id}/recipes/", response_model=Recipe)
+def create_recipe_for_user(user_id: int, recipe: RecipeCreate, db: Session = Depends(get_db)):
+    return crud.create_user_recipe(db=db, recipe=recipe, author_id=user_id)
+
+
+@app.get("/recipes/", response_model=List[Recipe])
+def read_recipes(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
+    recipes = crud.get_recipes(db, skip=skip, limit=limit)
+    return recipes
