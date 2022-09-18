@@ -7,8 +7,10 @@ from fastapi.security import OAuth2PasswordBearer
 from sqlalchemy.orm import Session
 from recipes_api import schemas, models
 import os
-from .crud import get_db, get_user_by_name
+from .crud import get_user_by_name, get_db
 from dotenv import load_dotenv
+
+
 load_dotenv()
 
 
