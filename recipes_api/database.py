@@ -7,11 +7,10 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-# SQLALCHEMY_DATABASE_URL = f"postgresql://{settings.DB_USER}:{settings.DB_PASS}@{settings.DB_HOSTNAME}:{settings.DB_PORT}/{settings.DB_NAME}"
 
 
 
-SQLALCHEMY_DATABASE_URL = "postgresql://niolum:170498sb@localhost/recipesdb"
+SQLALCHEMY_DATABASE_URL = os.getenv("DATABASE_URL")
 
 engine = create_engine(
     SQLALCHEMY_DATABASE_URL
@@ -19,10 +18,3 @@ engine = create_engine(
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 Base = declarative_base()
-
-def get_db():
-    db = SessionLocal()
-    try:
-        yield db
-    except:
-        db.close()
