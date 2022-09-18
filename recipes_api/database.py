@@ -11,7 +11,7 @@ load_dotenv()
 
 
 
-SQLALCHEMY_DATABASE_URL = "postgresql://niolum:170498sb@postgresserver/recipesdb"
+SQLALCHEMY_DATABASE_URL = "postgresql://niolum:170498sb@localhost/recipesdb"
 
 engine = create_engine(
     SQLALCHEMY_DATABASE_URL
