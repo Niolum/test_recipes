@@ -17,15 +17,20 @@ class TypeRecipeEnum(enum.Enum):
     vipechka = 'Выпечка'
 
 
+user_recipe = Table('user_recipes', Base.metadata,
+    Column('user_id', ForeignKey('users.id'), primary_key=True),
+    Column('recipe_id', ForeignKey('recipes.id'), primary_key=True)
+)
+
 class User(Base):
     __tablename__ = "users"
 
     id = Column(Integer, primary_key=True, index=True, unique=True)
-    username = Column(String(30), nullable= False, index=True, comment='Имя пользователя')
+    username = Column(String(30), unique=True, nullable= False, index=True, comment='Имя пользователя')
     hashed_password = Column(String, comment='Пароль')
     is_blocked = Column(Boolean, default=False, index=True, comment='Статус: заблокирован или активен')
     is_superuser = Column(Boolean,default=False)
-    favorites = relationship('Recipe', secondary='user_recipe', back_populates='users')
+    favorites = relationship('Recipe', secondary=user_recipe, back_populates='users')
     created_on = Column(DateTime(), default=datetime.now, comment='Дата создания')
     updated_on = Column(DateTime(), default=datetime.now, onupdate=datetime.now, comment='Дата измерерия')
     recipes = relationship('Recipe', back_populates='author')
@@ -47,10 +52,6 @@ class Recipe(Base):
     like = Column(Integer, comment='Лайки')
     set_hashtag = Column(String, comment='Набор хэштегов') 
     is_blocked = Column(Boolean, index=True, comment='Статус: заблокирован или активен')
-    users = relationship('User', secondary='user_recipe', back_populates='recipes')
+    users = relationship('User', secondary=user_recipe, back_populates='recipes')
 
 
-user_recipe = Table('user_recipes', Base.metadata,
-    Column('user_id', ForeignKey('users.id'), primary_key=True),
-    Column('recipe_id', ForeignKey('recipes.id'), primary_key=True)
-)
