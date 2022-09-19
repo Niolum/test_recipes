@@ -19,9 +19,9 @@
 
       pip install -r requirements.txt
 
-      in the dev.env file there are parameters for launching as an example:
+      in the example.env file there are parameters for launching as an example:
 
-        - DATABASE_URL
+        - DATABASE_URL (change your password and name of database)
         - ACCESS_TOKEN_EXPIRE_MINUTES
         - ALGORITHM
         - SECRET_KEY
