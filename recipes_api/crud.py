@@ -16,7 +16,7 @@ def get_user_by_name(db: Session, username: str):
 
 
 def get_users(db: Session, skip: int = 0, limit: int = 10):
-    return db.query(models.User).offset(skip).limit(limit).all()
+    return db.query(models.User).filter(models.User.is_blocked == False).offset(skip).limit(limit).all()
 
 
 def create_user(db: Session, user: schemas.UserCreate):
@@ -26,6 +26,21 @@ def create_user(db: Session, user: schemas.UserCreate):
     db.commit()
     db.refresh(db_user)
     return db_user
+
+
+def update_username(db: Session, username: str, user: schemas.UserUpdate):
+    db_user = db.query(models.User).filter(models.User.username == username).first()
+    db_user.username = user.username
+    db.add(db_user)
+    db.commit()
+    db.refresh(db_user)
+    return db_user
+
+
+def delete_user(db: Session, username: str):
+    db.delete(get_user_by_name(db, username=username))
+    db.commit()
+    return {'message': f"Successfully deleted {username}"}
 
 
 def get_category_by_name(db: Session, name: str):
@@ -43,6 +58,10 @@ def create_category(db: Session, category: schemas.CategoryCreate):
 
 def get_recipes(db: Session, skip: int = 0, limit: int = 100):
     return db.query(models.Recipe).offset(skip).limit(limit).all()
+
+
+def get_recipe_by_id(db: Session, recipe_id: int):
+    return db.query(models.Recipe).filter(models.Recipe.id == recipe_id).first()
 
 
 def create_user_recipe(db: Session, recipe: schemas.RecipeCreate, user_id: int, category_id: int):
