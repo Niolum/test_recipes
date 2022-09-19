@@ -1,6 +1,7 @@
 from . import models, schemas
 from pytils.translit import slugify
 
+from sqlalchemy import desc
 from sqlalchemy.orm import Session
 
 from . import main
@@ -57,7 +58,7 @@ def create_category(db: Session, category: schemas.CategoryCreate):
 
 
 def get_recipes(db: Session, skip: int = 0, limit: int = 100):
-    return db.query(models.Recipe).offset(skip).limit(limit).all()
+    return db.query(models.Recipe).filter(models.Recipe.is_blocked == False).order_by(desc(models.Recipe.created_on), desc(models.Recipe.like), models.Recipe.name).offset(skip).limit(limit).all()
 
 
 def get_recipe_by_id(db: Session, recipe_id: int):
@@ -72,3 +73,20 @@ def create_user_recipe(db: Session, recipe: schemas.RecipeCreate, user_id: int, 
     return db_recipe
 
 
+def update_recipe(db: Session, name: str, recipe: schemas.RecipeUpdate):
+    db_recipe = db.query(models.Recipe).filter(models.Recipe.name == name).first()
+    db_recipe.name = recipe.name
+    db_recipe.description = recipe.description
+    db_recipe.coocking_steps = recipe.coocking_steps
+    db_recipe.set_hashtag = recipe.set_hashtag
+    db.add(db_recipe)
+    db.commit()
+    db.refresh(db_recipe)
+    return db_recipe
+
+
+def delete_recipe(db: Session, name: str):
+    db_recipe = db.query(models.Recipe).filter(models.Recipe.name == name).first()
+    db.delete(db_recipe)
+    db.commit()
+    return {'message': f"Successfully deleted {name}"}

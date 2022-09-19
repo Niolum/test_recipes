@@ -27,6 +27,8 @@ class Category(CategoryBase):
 class RecipeBase(BaseModel):
     name: str
     description: Union[str, None] = None
+    set_hashtag: Union[str, None] = None
+
 
 
     class Config:
@@ -38,6 +40,10 @@ class RecipeCreate(RecipeBase):
     coocking_steps: Union[str, None] = None
 
 
+class RecipeUpdate(RecipeBase):
+    coocking_steps: Union[str, None] = None
+    
+
 class Recipes(RecipeBase):
     id: int
     is_blocked: Optional[bool] = False
@@ -46,7 +52,6 @@ class Recipes(RecipeBase):
     updated_on: datetime
     like: Union[int, None] = None
     author_id: int 
-    set_hashtag: Union[str, None] = None
     photo: Image = None
 
 
