@@ -67,18 +67,29 @@ def get_recipe_by_id(db: Session, recipe_id: int):
 
 def create_user_recipe(db: Session, recipe: schemas.RecipeCreate, user_id: int, category_id: int):
     db_recipe = models.Recipe(**recipe.dict(), author_id=user_id, category_id=category_id)
+    db_recipe.like = 0
     db.add(db_recipe)
     db.commit()
     db.refresh(db_recipe)
     return db_recipe
 
 
-def update_recipe(db: Session, name: str, recipe: schemas.RecipeUpdate):
-    db_recipe = db.query(models.Recipe).filter(models.Recipe.name == name).first()
+def update_recipe(db: Session, recipe_id: id, recipe: schemas.RecipeUpdate):
+    db_recipe = db.query(models.Recipe).filter(models.Recipe.id == recipe_id).first()
     db_recipe.name = recipe.name
     db_recipe.description = recipe.description
     db_recipe.coocking_steps = recipe.coocking_steps
     db_recipe.set_hashtag = recipe.set_hashtag
+    db_recipe.photo = recipe.photo
+    db.add(db_recipe)
+    db.commit()
+    db.refresh(db_recipe)
+    return db_recipe
+
+
+def create_like_recipe(db: Session, recipe_id: int):
+    db_recipe = db.query(models.Recipe).filter(models.Recipe.id == recipe_id).first()
+    db_recipe.like += 1
     db.add(db_recipe)
     db.commit()
     db.refresh(db_recipe)
