@@ -27,27 +27,31 @@ class Category(CategoryBase):
 class RecipeBase(BaseModel):
     name: str
     description: Union[str, None] = None
-    coocking_steps: Union[str, None] = None
+
 
     class Config:
         orm_mode = True
         arbitrary_types_allowed = True
 
+
 class RecipeCreate(RecipeBase):
-    pass
+    coocking_steps: Union[str, None] = None
 
 
-class Recipe(RecipeBase):
+class Recipes(RecipeBase):
     id: int
-    is_blocked: bool
+    is_blocked: Optional[bool] = False
     category_id: int
     created_on: datetime
     updated_on: datetime
-    like: int
+    like: Union[int, None] = None
     author_id: int 
-    photo = Union[Image, None]
-    set_hashtag: Union[str, None] = None 
-    users: List['User'] = []
+    set_hashtag: Union[str, None] = None
+    photo: Image = None
+
+
+class Recipe(Recipes):
+    coocking_steps: Union[str, None] = None
 
     class Config:
         orm_mode = True
@@ -80,7 +84,6 @@ class UserCreate(UserBase):
     password: str
 
 
-
 class UserUpdate(UserBase):
     username: Optional[str] = None
     
@@ -88,12 +91,15 @@ class UserUpdate(UserBase):
 class User(UserBase):
     id: int 
     is_blocked: Optional[bool] = False
-    is_superuser: Optional[bool] = False
-    favorites: List[Recipe] = []
-    recipes: List[Recipe] = []
-    disabled: bool
-    created_on: datetime
-    update_on: datetime
+    recipes: List[RecipeBase] = []
 
     class Config:
         orm_mode = True
+
+
+class UserOut(UserBase):
+    is_superuser: Optional[bool] = False
+    disabled: bool
+    favorites: List[Recipe] = []
+    created_on: datetime
+    update_on: datetime
