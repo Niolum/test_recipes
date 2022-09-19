@@ -45,7 +45,7 @@ class Recipe(Base):
     created_on = Column(DateTime(), default=datetime.now, comment='Дата создания')
     updated_on = Column(DateTime(), default=datetime.now, onupdate=datetime.now, comment='Дата измерерия')
     name = Column(String(120), comment='Название блюда')
-    type_of_recipe = Column(Enum(TypeRecipeEnum), nullable=False)
+    type_of_recipe = Column(Enum(TypeRecipeEnum), default=TypeRecipeEnum.pervoe, nullable=False)
     description = Column(String, comment='Описание')
     coocking_steps = Column(String, comment='Шаги приготовления')
     photo = Column(String, nullable=True)
