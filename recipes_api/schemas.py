@@ -3,10 +3,6 @@ from datetime import datetime
 from pydantic import BaseModel, HttpUrl
 
 
-class Image(BaseModel):
-    url: HttpUrl
-    name: str
-
 
 class CategoryBase(BaseModel):
     name: str
@@ -28,7 +24,7 @@ class RecipeBase(BaseModel):
     name: str
     description: Union[str, None] = None
     set_hashtag: Union[str, None] = None
-
+    photo: Union[str, None] = None
 
 
     class Config:
@@ -42,6 +38,7 @@ class RecipeCreate(RecipeBase):
 
 class RecipeUpdate(RecipeBase):
     coocking_steps: Union[str, None] = None
+    photo: Union[str, None] = None
     
 
 class Recipes(RecipeBase):
@@ -51,8 +48,11 @@ class Recipes(RecipeBase):
     created_on: datetime
     updated_on: datetime
     like: Union[int, None] = None
-    author_id: int 
-    photo: Image = None
+    author_id: int
+
+
+class RecipeLike(BaseModel):
+    like: Union[int, None] = None 
 
 
 class Recipe(Recipes):
@@ -95,7 +95,7 @@ class UserUpdate(UserBase):
 
 class User(UserBase):
     id: int 
-    is_blocked: Optional[bool] = False
+    is_blocked: Union[bool, None] = False
     recipes: List[RecipeBase] = []
 
     class Config:
