@@ -1,20 +1,11 @@
-from sqlalchemy import Boolean, Column, ForeignKey, Integer, String, DateTime, Enum, Table
+from sqlalchemy import Boolean, Column, ForeignKey, Integer, String, DateTime, Table
 from sqlalchemy.orm import relationship, declarative_base
 from datetime import datetime
-import enum
 
 from .database import Base
 
 
 Base = declarative_base()
-
-class TypeRecipeEnum(enum.Enum):
-    salat = 'Салат'
-    pervoe = 'Первое'
-    vtoroe ='Второе'
-    desert = 'Десерт'
-    napitok = 'Напиток'
-    vipechka = 'Выпечка'
 
 
 user_recipe = Table('user_recipes', Base.metadata,
@@ -36,6 +27,16 @@ class User(Base):
     recipes = relationship('Recipe', back_populates='author')
     disabled = Column(Boolean, comment='Статус: онлайн или нет')
 
+
+class Category(Base):
+    __tablename__ = "categories"
+
+    id = Column(Integer, primary_key=True, index=True, unique=True)
+    name = Column(String, unique=True, nullable=False, index=True, comment='Название типа блюда')
+    slug = Column(String, unique=True)
+    recipes = relationship('Recipe', back_populates='category')
+
+
 class Recipe(Base):
     __tablename__ = "recipes"
 
@@ -45,7 +46,8 @@ class Recipe(Base):
     created_on = Column(DateTime(), default=datetime.now, comment='Дата создания')
     updated_on = Column(DateTime(), default=datetime.now, onupdate=datetime.now, comment='Дата измерерия')
     name = Column(String(120), comment='Название блюда')
-    type_of_recipe = Column(Enum(TypeRecipeEnum), default=TypeRecipeEnum.pervoe, nullable=False)
+    category_id = Column(Integer, ForeignKey("categories.id"))
+    category = relationship('Category', back_populates='recipes')
     description = Column(String, comment='Описание')
     coocking_steps = Column(String, comment='Шаги приготовления')
     photo = Column(String, nullable=True)
