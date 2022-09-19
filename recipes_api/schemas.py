@@ -1,7 +1,6 @@
 from typing import List, Union, Optional
 from datetime import datetime
 from pydantic import BaseModel, HttpUrl
-from enum import Enum
 
 
 class Image(BaseModel):
@@ -9,13 +8,20 @@ class Image(BaseModel):
     name: str
 
 
-class TypeRecipeEnum(str, Enum):
-    salat = 'Салат'
-    pervoe = 'Первое'
-    vtoroe ='Второе'
-    desert = 'Десерт'
-    napitok = 'Напиток'
-    vipechka = 'Выпечка'
+class CategoryBase(BaseModel):
+    name: str
+
+    class Config:
+        orm_mode = True
+
+
+class CategoryCreate(CategoryBase):
+    pass
+
+
+class Category(CategoryBase):
+    id: int
+    slug: str
 
 
 class RecipeBase(BaseModel):
@@ -34,7 +40,7 @@ class RecipeCreate(RecipeBase):
 class Recipe(RecipeBase):
     id: int
     is_blocked: bool
-    type_of_recipe: Optional[TypeRecipeEnum]
+    category_id: int
     created_on: datetime
     updated_on: datetime
     like: int

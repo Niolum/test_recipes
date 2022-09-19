@@ -9,8 +9,6 @@ from .database import SessionLocal
 from sqlalchemy.orm import Session
 
 from recipes_api import crud, schemas, services
-# from .crud import get_db
-
 
 
 load_dotenv()
@@ -71,9 +69,17 @@ def read_users(skip: int = 0, limit: int = 10, db: Session = Depends(get_db)):
     return users
 
 
+@app.post("/categories/", response_model=schemas.CategoryBase)
+def create_new_category(category: schemas.CategoryCreate, db: Session = Depends(get_db)):
+    db_category = crud.get_category_by_name(db=db, name=category.name)
+    if db_category:
+        raise HTTPException(status_code=400, detail="Category already exists")
+    return crud.create_category(db=db, category=category)
+
+
 @app.post("/users/{user_id}/recipes/", response_model=schemas.RecipeBase)
-def create_recipe_for_user(user_id: int, recipe: schemas.RecipeCreate, db: Session = Depends(get_db)):
-    return crud.create_user_recipe(db=db, recipe=recipe, user_id=user_id)
+def create_recipe_for_user(category_id: int, user_id: int, recipe: schemas.RecipeCreate, db: Session = Depends(get_db)):
+    return crud.create_user_recipe(db=db, recipe=recipe, user_id=user_id, category_id=category_id)
 
 
 @app.get("/recipes/", response_model=List[schemas.RecipeBase])
