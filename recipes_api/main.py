@@ -107,3 +107,13 @@ def read_recipe(recipe_id: int, db: Session = Depends(get_db)):
     if db_recipe is None:
         raise HTTPException(status_code=404, detail="Recipe not found")
     return db_recipe
+
+
+@app.put("/recipes/{name}", response_model=schemas.RecipeUpdate)
+def update_recipe(name: str, recipe: schemas.RecipeUpdate, db: Session = Depends(get_db)):
+    return crud.update_recipe(name=name, recipe=recipe, db=db)
+
+
+@app.delete("/recipes/{name}")
+def delete_recipe(name: str, db: Session = Depends(get_db)):
+    return crud.delete_recipe(name=name, db=db)
