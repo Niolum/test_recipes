@@ -57,17 +57,23 @@ def read_user(user_id: int, db: Session = Depends(services.get_db), current_user
     db_user = crud.get_user(db, user_id=user_id)
     if db_user is None:
         raise HTTPException(status_code=404, detail="User not found")
+    if current_user.is_blocked == True:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN)
     return db_user
 
 
 @app.get("/users/", response_model=List[schemas.User])
 def read_users(skip: int = 0, limit: int = 10, db: Session = Depends(services.get_db), current_user: schemas.User = Depends(services.get_current_active_user)):
     users = crud.get_users(db, skip=skip, limit=limit)
+    if current_user.is_blocked == True:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN)
     return users
 
 
 @app.put("/users/{username}", response_model=schemas.UserUpdate)
 def update_username(username: str, user: schemas.UserUpdate, db: Session = Depends(services.get_db), current_user: schemas.User = Depends(services.get_current_active_user)):
+    if current_user.is_blocked == True:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN)
     return crud.update_username(username=username, user=user, db=db)
 
 
@@ -76,6 +82,8 @@ def delete_user(username: str, db: Session = Depends(services.get_db), current_u
     db_user = crud.get_user_by_name(db, username=username)
     if db_user is None:
         raise HTTPException(status_code=404, detail="User not found")
+    if current_user.is_blocked == True:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN)
     return crud.delete_user(db, username=username )
 
 
@@ -84,6 +92,8 @@ def create_new_category(category: schemas.CategoryCreate, db: Session = Depends(
     db_category = crud.get_category_by_name(db=db, name=category.name)
     if db_category:
         raise HTTPException(status_code=400, detail="Category already exists")
+    if current_user.is_blocked == True:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN)
     return crud.create_category(db=db, category=category)
 
 
@@ -95,12 +105,16 @@ def create_recipe_for_user(
     db: Session = Depends(services.get_db), 
     current_user: schemas.User = Depends(services.get_current_active_user)
 ):
+    if current_user.is_blocked == True:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN)
     return crud.create_user_recipe(db=db, recipe=recipe, user_id=user_id, category_id=category_id)
 
 
 @app.get("/recipes/", response_model=List[schemas.Recipes])
 def read_recipes(skip: int = 0, limit: int = 100, db: Session = Depends(services.get_db), current_user: schemas.User = Depends(services.get_current_active_user)):
     recipes = crud.get_recipes(db, skip=skip, limit=limit)
+    if current_user.is_blocked == True:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN)
     return recipes
 
 
@@ -109,19 +123,27 @@ def read_recipe(recipe_id: int, db: Session = Depends(services.get_db), current_
     db_recipe = crud.get_recipe_by_id(db=db, recipe_id=recipe_id)
     if db_recipe is None:
         raise HTTPException(status_code=404, detail="Recipe not found")
+    if current_user.is_blocked == True:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN)
     return db_recipe
 
 
 @app.put("/recipes/{recipe_id}", response_model=schemas.RecipeUpdate)
 def update_recipe(recipe_id: int, recipe: schemas.RecipeUpdate, db: Session = Depends(services.get_db), current_user: schemas.User = Depends(services.get_current_active_user)):
+    if current_user.is_blocked == True:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN)    
     return crud.update_recipe(recipe_id=recipe_id, recipe=recipe, db=db)
 
 
 @app.patch("/recipes/{recipe_id}")
 def create_like_recipe(recipe_id: int, db: Session = Depends(services.get_db),current_user: schemas.User = Depends(services.get_current_active_user)):
+    if current_user.is_blocked == True:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN)
     return crud.create_like_recipe(recipe_id=recipe_id, db=db)
 
 
 @app.delete("/recipes/{name}")
 def delete_recipe(name: str, db: Session = Depends(services.get_db), current_user: schemas.User = Depends(services.get_current_active_user)):
+    if current_user.is_blocked == True:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN)
     return crud.delete_recipe(name=name, db=db)
