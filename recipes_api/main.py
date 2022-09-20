@@ -74,6 +74,8 @@ def read_users(skip: int = 0, limit: int = 10, db: Session = Depends(services.ge
 def update_username(username: str, user: schemas.UserUpdate, db: Session = Depends(services.get_db), current_user: schemas.User = Depends(services.get_current_active_user)):
     if current_user.is_blocked == True:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN)
+    if current_user.username != username:
+        raise HTTPException(status_code=403, detail="You can't update not your username")
     return crud.update_username(username=username, user=user, db=db)
 
 
@@ -84,6 +86,8 @@ def delete_user(username: str, db: Session = Depends(services.get_db), current_u
         raise HTTPException(status_code=404, detail="User not found")
     if current_user.is_blocked == True:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN)
+    if current_user.username != username:
+        raise HTTPException(status_code=403, detail="You can't delete not your profile")
     return crud.delete_user(db, username=username )
 
 
@@ -131,7 +135,7 @@ def read_recipe(recipe_id: int, db: Session = Depends(services.get_db), current_
 @app.put("/recipes/{recipe_id}", response_model=schemas.RecipeUpdate)
 def update_recipe(recipe_id: int, recipe: schemas.RecipeUpdate, db: Session = Depends(services.get_db), current_user: schemas.User = Depends(services.get_current_active_user)):
     if current_user.is_blocked == True:
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN)    
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN)   
     return crud.update_recipe(recipe_id=recipe_id, recipe=recipe, db=db)
 
 
