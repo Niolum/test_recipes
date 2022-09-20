@@ -104,7 +104,7 @@ class User(UserBase):
 
 class UserOut(UserBase):
     is_superuser: Optional[bool] = False
-    disabled: bool
+    disabled: Union[bool, None] = None
     favorites: List[Recipe] = []
     created_on: datetime
     update_on: datetime
